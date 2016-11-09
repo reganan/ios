@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>App 方法测试</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <style>
+    .panel-title {
+        font-size:12px;
+    }
+    p {
+        word-wrap:break-word;
+    }
+    </style>
+    <script src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script>
+    function appMethod (methodName, params) {  
+        // console.log(methodName, params)
+        var appMethod = window['callYintaiMobileMethod'];
+
+        if (appMethod && appMethod[methodName]) {
+            if (params) {
+                appMethod[methodName](params);
+            } else {
+                appMethod[methodName]();
+            }
+
+            return;
+        }
+
+        if (!appMethod) {
+            alert('非 App 环境');
+            return;
+        }
+
+        if (!appMethod[methodName]) {
+            alert(methodName + ' 方法不存在');
+        }
+    }
+
+    $(function () {
+        var $accordion = $('#accordion');
+
+        $(document).on('click', 'button', function () {
+            var $this = $(this);
+            var data = $this.data();
+
+            // console.log(JSON.stringify(data));
+            appMethod(data['method'], data['params']);
+        });
+
+        var testData = [{
+            title: '登录',
+            methodString: 'jump(string params)',
+            paramsString: 'yintaimobile://Login',
+            params: {
+                templateid: '模板示例 id（可选）'
+            },
+            buttons: [{
+                methodName: 'jump'
+            }]
+        }, {
+            title: '跳到商品详情页',
+            methodString: 'jump(string params)',
+            paramsString: 'yintaimobile://HomePage?sku=20-211-3406&imageUrl=http://p10.ytrss.com/product/20/211/3405/GridImage/546.jpg',
+            params: {
+                sku: '商品id',
+                imageUrl: '商品图片,用于记录用户浏览历史'
+            },
+            buttons: [{
+                methodName: 'jump'
+            }]
+        }, {
+            title: '更改标题',
+            methodString: 'setTitleBar(String params)',
+            paramsString: 'yintaimobile://SetTitleBar?position=middle&isShow=true&value=自定义标题',
+            params: {
+                position: 'left、right、middle',
+                isShow: 'true：显示；false：隐藏',
+                value: '标题的值'
+            },
+            buttons: [{
+                methodName: 'setTitleBar'
+            }]
+        }, {
+            title: '屏蔽、启用顶部和底部',
+            methodString: 'setTitleBar(String params)',
+            methodName: 'setTitleBar',
+            paramsString: 'yintaimobile://ShieldTopBottom?state=true',
+            params: {
+                state: 'true：屏蔽；false：取消屏蔽'
+            },
+            buttons: [{
+                text: '屏蔽',
+                params: 'yintaimobile://ShieldTopBottom?state=true'
+            }, {
+                text: '启用',
+                params: 'yintaimobile://ShieldTopBottom?state=false'
+            }]
+        }, {
+            title: '弹出、隐藏loading框',
+            methodString: 'pageloadopen()、pageloadclose()',
+            buttons: [{
+                methodName: 'pageloadopen',
+                text: '弹出loading框'
+            }, {
+                methodName: 'pageloadclose',
+                text: '隐藏loading框'
+            }]
+        }, {
+            title: '购物车数量更改',
+            methodString: 'setTitleBar(String params)',
+            paramsString: 'yintaimobile://ShopCarCount?count=3',
+            params: {
+                count: '购物车商品数量'
+            },
+            buttons: [{
+                methodName: 'setTitleBar'
+            }]
+        }, {
+            title: '显示、隐藏右侧按钮',
+            methodString: 'setTitleBar(String params)',
+            methodName: 'setTitleBar',
+            paramsString: 'yintaimobile://SetTitleBar?position=right&isShow=false',
+            params: {
+                position: 'left、right、middle',
+                isShow: 'true：显示；false：隐藏'
+            },
+            buttons: [{
+                text: '隐藏',
+                params: 'yintaimobile://SetTitleBar?position=right&isShow=false'
+            }, {
+                text: '显示',
+                params: 'yintaimobile://SetTitleBar?position=right&isShow=true'
+            }]
+        }, {
+            title: '跳转到提交成功页面',
+            methodString: 'jump(string params)',
+            paramsString: 'yintaimobile://OrderSubmitInfo?orderId=524155&payModeCode=3&payTypeName=支付宝&amount=88.8&isShowPayBtn=true',
+            params: {
+                orderId: '订单号',
+                payModeCode: '支付方式',
+                payTypeName: '支付名称',
+                amount: '订单金额',
+                isShowPayBtn: '是否显示支付按钮'
+            },
+            buttons: [{
+                methodName: 'jump'
+            }]
+        }, {
+            title: '获取用户相关信息',
+            methodString: 'getuserinfo()',
+            buttons: [{
+                methodName: 'getuserinfo'
+            }]
+        }, {
+            title: '告诉客户端关闭当前页面',
+            methodString: 'closeCurrentPage()',
+            buttons: [{
+                methodName: 'closeCurrentPage'
+            }]
+        }, {
+            title: '记录BI',
+            methodString: 'onBiEvent(String eventJson)',
+            buttons: [{
+                methodName: 'onBiEvent'
+            }]
+        }, {
+            title: '立即支付',
+            methodString: 'startPayNow(String params)',
+            paramsString: 'yintaimobile://PayNow?orderId=125544&orderSource=1',
+            params: {
+                orderId: '订单号',
+                orderSource: '1:电子小票支付、2:ERP订单支付'
+            },
+            buttons: [{
+                methodName: 'startPayNow'
+            }]
+        }];
+
+        // TODO delete
+        $accordion.empty();
+        var html = '';
+        var fragment = [];
+        var prop, i;
+        testData.forEach(function (data, index) {
+            fragment = [];
+            fragment.push('<div class="panel panel-default">');
+            fragment.push('<div class="panel-heading" id="heading' + index + '">');
+            fragment.push('<h4 class="panel-title">');
+            fragment.push('<a data-toggle="collapse" data-parent="#accordion" href="#collapse' + index + '">');
+            fragment.push( data.title + '：' + data.methodString);
+            fragment.push('</a>');
+            fragment.push('</h4>');
+            fragment.push('</div>');
+            fragment.push('<div class="panel-collapse collapse" id="collapse' + index + '">');
+            fragment.push('<div class="panel-body">');
+
+            if (data.paramsString) {
+                fragment.push('<p>params：' + data.paramsString + '</p>');
+            }
+
+            if (data.params) {
+                for (prop in data.params) {
+                    fragment.push('<p>' + prop + '：' + data.params[prop] + '</p>');
+                }
+            }
+
+            for (i = 0; i < data.buttons.length; i++) {
+                fragment.push('<button type="button" class="btn btn-primary" data-method="' +
+                    (data.methodName || data.buttons[i].methodName) + '"' +
+                    (data.paramsString ? ' data-params="' + (data.buttons[i].params || data.paramsString) + '"' : '') + '>' +
+                    (data.buttons[i].text || '测试') + '</button> ');
+            }
+            fragment.push('</div>');
+            fragment.push('</div>');
+            fragment.push('</div>');
+
+            html += fragment.join('');
+        });
+
+        $accordion.html(html);
+    });
+    </script>
+</head>
+<body style="padding:8px">
+    <h2>App 方法测试</h2>
+    <div class="panel-group" id="accordion"></div>
+    <script>
+    // yintaimobile://ClickTitleBar?position=left&txtValue=返回
+    window.clickTitleBar = function (params) {
+        var txt = 'txtValue=';
+        var start = params.indexOf(txt);
+        var end = params.indexOf('&', start);
+        alert(params.substring(start + txt.length, end > 0 ? end : params.length));
+    };
+    </script>
+</body>
+</html>
